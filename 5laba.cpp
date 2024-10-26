@@ -1,4 +1,3 @@
-
 #include <iostream> 
 #include <string>  // подключаем библиотеку для работы со строками 
 
@@ -73,7 +72,6 @@ public:
     bool operator>(const Weapon& other) const {
         return this->getDamage() > other.getDamage();
     }
-    //Const в C++ — это ключевое слово, которое указывает, что значение переменной или параметра функции является неизменяемым 
 
     // Оператор сравнения < 
     bool operator<(const Weapon& other) const {
@@ -91,7 +89,7 @@ struct Player {
     std::string password;  // Пароль 
 
     // Функция для вывода данных игрока 
-    void displayInfo() const {
+    void displayInfo() {
         std::cout << "\nID: " << id << "\nЛогин: " << username << "\nПароль: " << password << std::endl;
     }
 };
@@ -106,7 +104,7 @@ private:
 public:
     // Конструктор с параметрами 
     MagicWeapon(const std::string& weaponName, int weaponDamage, float weaponWeight, WeaponType tiporushia, int extraDmg)
-        : Weapon(weaponDamage, weaponWeight, tiporushia), extraDamage(extraDmg) {}
+        : Weapon(weaponName, weaponDamage, weaponWeight, tiporushia), extraDamage(extraDmg) {}
 
     // Конструктор без параметров 
     MagicWeapon() : MagicWeapon("Магическое оружие", 15, 1.5f, ONEHANDED, 5) {}
@@ -117,9 +115,11 @@ public:
     }
 
     //возращает сумму урона и доп урона 
-    int getDamage() const {//то есть если в родительском классе мы забудем добавить метод getDamage, то будет ошибка 
-        return damage + extraDamage; //Модификатор override позволяет компилятору следить за тем, чтобы метод,помеченный этим модификатором действительно переопределял метод базового класса.  
-     
+    int getDamage() const override {//то есть если в родительском классе мы забудем добавить метод getDamage, то будет ошибка 
+
+        //Модификатор override gзволяет компилятору следить за тем, чтобы метод,
+            //помеченный этим модификатором действительно переопределял метод базового класса.  
+            return damage + extraDamage;
     }
 };
 
@@ -186,146 +186,6 @@ int main() {
     else {
         std::cout << sword.getName() << " и " << magicSword.getName() << " равны по силе." << std::endl;
     }
-
-
-    return 0;
-}
-
-
-#include <iostream> // Подключаем библиотеку для выполнения ввода-вывода 
-#include <string>   // Подключаем библиотеку для работы со строками 
-using namespace std; // Используем стандартное пространство имен, чтобы не писать каждый раз std 
-
-//  Создаем абстрактный класс Оружие с чисто виртуальной функцией Attack 
-
-//Абстрактный класс в C++ — это класс, объект которого нельзя создать, 
-// но который может использоваться в качестве базового класса для других классов. 
-
-//поэтому мы не стали использовать предыдущее задание,так как в нем класс оружия был не абсрактным (там мы создавали меч) 
-class Weapon {
-public:
-    virtual void Attack() = 0; // Чисто виртуальная функция 
-
-    //Виртуальная функция — это функция, которую предполагается переопределить в производных классах. 
-    //то есть ниже мы определяем ее отдельно для магического и одноразового оружия 
-};
-
-// Реализуем класс МагическоеОружие, который наследует Weapon 
-//с помощью негоо можно вывести сообщение, что мы им аттакуем 
-class MagicWeapon : public Weapon {
-
-public:
-    // Переопределяем метод Attack для магического оружия 
-    void Attack() override {
-        cout << "Атакуем магическим оружием" << endl; // Выводим сообщение в консоль 
-    }
-};
-
-
-//  Создаем класс ОдноразовоеОружие, который также наследует Weapon 
-class DisposableWeapon : public Weapon {
-private: //bool - true/false 
-    bool used; //  Поле-флаг для отслеживания использования оружия 
-    string name; // Имя оружия 
-public:
-    // Конструктор, который инициализирует флаг used значением false 
-    DisposableWeapon(string weaponName) : used(false), name(weaponName) {}// по умолчанию оружие не использовано 
-
-    // Переопределяем метод Attack 
-    void Attack() override {
-        if (used) { // Проверяем, было ли оружие использовано 
-            cout << "Оружие уже было использовано" << endl; // Сообщаем, если использовано 
-        }
-        else {
-            cout << "Атакуем одноразовым оружием " << name << endl; // Атакуем, если не использовано 
-            used = true; // Устанавливаем флаг использования в true 
-        }
-    }
-};
-
-
-
-
-
-//  Создаем шаблонный класс для хранения оружия в левой и правой руке 
-//Шаблонный класс в C++ — это класс, который позволяет задать внутри класса объекты, тип которых на этапе написания кода неизвестен 
-//это мы делает потому что мы заранее не знаем, какое оружие в какой руке находится 
-template <typename LeftWeaponType, typename RightWeaponType>
-class WeaponStorage {
-private:
-    LeftWeaponType leftWeapon; // Оружие в левой руке 
-    RightWeaponType rightWeapon; // Оружие в правой руке 
-
-public:
-    // Конструктор для инициализации оружия 
-    WeaponStorage(LeftWeaponType lw, RightWeaponType rw)
-        : leftWeapon(lw), rightWeapon(rw) {}
-
-    // Метод для установки левого оружия 
-    void setLeftWeapon(LeftWeaponType lw) {
-        leftWeapon = lw;
-    }
-
-    // Метод для получения левого оружия 
-    LeftWeaponType getLeftWeapon() {
-        return leftWeapon;
-    }
-
-    // Метод для установки правого оружия 
-    void setRightWeapon(RightWeaponType rw) {
-        rightWeapon = rw;
-    }
-
-    // Метод для получения правого оружия 
-    RightWeaponType getRightWeapon() {
-        return rightWeapon;
-    }
-};
-
-
-
-
-
-int main() {
-
-    setlocale(LC_ALL, "Russian");
-    //  Убедимся, что нельзя создать экземпляр абстрактного класса 
-    //Weapon Sword; // Это вызовет ошибку компиляции 
-
-    //  Создаем экземпляр магического оружия и вызываем метод Attack 
-    MagicWeapon magicWeapon;
-    magicWeapon.Attack(); // Ожидаем "Атакуем магическим оружием" 
-
-
-
-
-    // Создаем экземпляр одноразового оружия 
-    DisposableWeapon palka("палка");
-
-    // Первый вызов Attack 
-    palka.Attack(); // Ожидаем "Атакуем одноразовым оружием" 
-    // Второй вызов Attack 
-    palka.Attack(); // Ожидаем "Оружие уже было использовано" 
-
-
-    // Создаем экземпляр одноразового оружия (так как первая палка сломалась) 
-    DisposableWeapon palka2("палка2");
-
-
-
-    //  Проверяем работу шаблона с типами оружия и целочисленным типом
-        WeaponStorage<MagicWeapon, int> storage1(magicWeapon, 101); // Создаем хранилище 
-
-    // Получим и используем системы оружия 
-    storage1.getLeftWeapon().Attack(); //  "Атакуем магическим оружием" 
-    cout << "ID оружия в правой руке: " << storage1.getRightWeapon() << endl; // Выводим ID 
-
-
-    WeaponStorage<MagicWeapon, DisposableWeapon> storage3(magicWeapon, palka2); // Создаем хранилище 
-    storage3.getLeftWeapon().Attack(); //  "Атакуем магическим оружием" 
-    storage3.getRightWeapon().Attack(); //  "Атакуем одноразовым оружием" 
-
-
 
 
     return 0;
